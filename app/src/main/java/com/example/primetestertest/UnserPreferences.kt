@@ -31,6 +31,7 @@ object UserPreferences {
     val SHOW_QUIZ = booleanPreferencesKey("show_quiz")
     val SHOW_FIBONACCI = booleanPreferencesKey("show_fibonacci")
     val SHOW_SETTINGS = booleanPreferencesKey("show_settings")
+    val SHOW_ACHIEVEMENTS = booleanPreferencesKey("show_achievements")
 }
 
 suspend fun saveBirthday(context: Context, date: LocalDate) {

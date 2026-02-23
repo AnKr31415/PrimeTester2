@@ -13,11 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.Color
 import com.example.primetestertest.ui.theme.DeepBlue
 
 
@@ -84,6 +83,17 @@ fun FeaturesScreen(modifier: Modifier = Modifier) {
 
             FloatingActionButton(
                 onClick = {
+                    AppNavigation.currentDestination = AppDestinations.ACHIEVEMENTS
+                },
+                containerColor = DeepBlue,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+            ) {
+                Icon(Icons.Default.Star, contentDescription = "Achievements")
+            }
+
+            FloatingActionButton(
+                onClick = {
                     AppNavigation.currentDestination = AppDestinations.SETTINGS
                 },
                 containerColor = DeepBlue,
@@ -93,6 +103,5 @@ fun FeaturesScreen(modifier: Modifier = Modifier) {
                 Icon(Icons.Default.Settings, contentDescription = "Settings")
             }
         }
-
     }
 }

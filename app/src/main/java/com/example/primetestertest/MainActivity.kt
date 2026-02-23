@@ -1,6 +1,7 @@
 package com.example.primetestertest
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -18,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,6 +52,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PrimeTesterTestApp() {
     val context = LocalContext.current
+    val achievementManager = remember { AchievementManager(context.dataStore) }
+
+    // Popup-Logik für freigeschaltete Achievements
+    LaunchedEffect(Unit) {
+        achievementManager.newlyUnlocked.collect { achievement ->
+            Toast.makeText(
+                context,
+                "🏆 Achievement freigeschaltet: ${achievement.title}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
 
     // Sichtbarkeiten aus DataStore laden
     val showHome by loadVisibility(context, UserPreferences.SHOW_HOME, true).collectAsState(initial = true)
@@ -61,10 +75,11 @@ fun PrimeTesterTestApp() {
     val showQuiz by loadVisibility(context, UserPreferences.SHOW_QUIZ, false).collectAsState(initial = false)
     val showFibonacci by loadVisibility(context, UserPreferences.SHOW_FIBONACCI, false).collectAsState(initial = false)
     val showSettings by loadVisibility(context, UserPreferences.SHOW_SETTINGS, false).collectAsState(initial = false)
+    val showAchievements by loadVisibility(context, UserPreferences.SHOW_ACHIEVEMENTS, false).collectAsState(initial = false)
 
 
     // Map zur schnellen Prüfung der Sichtbarkeit
-    val visibilityMap = remember(showHome, showCalendar, showFeatures, showDiagramm, showFactorisation, showPrimeDays, showQuiz, showFibonacci) {
+    val visibilityMap = remember(showHome, showCalendar, showFeatures, showDiagramm, showFactorisation, showPrimeDays, showQuiz, showFibonacci, showAchievements) {
         mapOf(
             AppDestinations.HOME to showHome,
             AppDestinations.CALENDAR to showCalendar,
@@ -74,7 +89,8 @@ fun PrimeTesterTestApp() {
             AppDestinations.PRIME_DAYS to showPrimeDays,
             AppDestinations.QUIZ to showQuiz,
             AppDestinations.FIBONACCI to showFibonacci,
-            AppDestinations.SETTINGS to showSettings 
+            AppDestinations.SETTINGS to showSettings,
+            AppDestinations.ACHIEVEMENTS to showAchievements
         )
     }
 
@@ -94,7 +110,7 @@ fun PrimeTesterTestApp() {
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (AppNavigation.currentDestination) {
-                AppDestinations.HOME -> PrimeCheckerScreen(modifier = Modifier.padding(innerPadding))
+                AppDestinations.HOME -> PrimeCheckerScreen(achievementManager = achievementManager, modifier = Modifier.padding(innerPadding))
                 AppDestinations.PRIME_DAYS -> PrimeDaysScreen(context = LocalContext.current, modifier = Modifier.padding(innerPadding))
                 AppDestinations.FEATURES -> FeaturesScreen(modifier = Modifier.padding(innerPadding))
                 AppDestinations.DIAGRAMM -> DiagrammScreen(modifier = Modifier.padding(innerPadding))
@@ -103,6 +119,7 @@ fun PrimeTesterTestApp() {
                 AppDestinations.QUIZ -> QuizScreen(context = LocalContext.current, modifier = Modifier.padding(innerPadding))
                 AppDestinations.FIBONACCI -> FibonacciScreen(modifier = Modifier.padding(innerPadding))
                 AppDestinations.SETTINGS -> SettingsScreen(modifier = Modifier.padding(innerPadding))
+                AppDestinations.ACHIEVEMENTS -> AchievementList(manager = achievementManager)
             }
         }
     }
@@ -120,5 +137,6 @@ enum class AppDestinations(
     PRIME_DAYS("Primzahltage", Icons.Default.Favorite),
     QUIZ("Quiz", Icons.Default.Star),
     FIBONACCI("Fibonacci", Icons.Default.Star),
-    SETTINGS("Einstellungen", Icons.Default.Settings)
+    SETTINGS("Einstellungen", Icons.Default.Settings),
+    ACHIEVEMENTS("Achievements", Icons.Default.Star)
 }
